@@ -1,11 +1,13 @@
 {
   "name": "house-price-valuation",
   "version": "0.1.0",
+  "homepage": "https://thanhbinhtran93.github.io/price-valuation-kodit",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^3.9.0",
     "@material-ui/icons": "^3.0.2",
     "axios": "^0.18.0",
+    "gh-pages": "^2.0.1",
     "jest-dom": "^3.0.0",
     "material-ui-icons": "^1.0.0-beta.36",
     "react": "^16.7.0",
@@ -18,6 +20,8 @@
     "redux-thunk": "^2.3.0"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

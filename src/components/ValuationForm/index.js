@@ -194,7 +194,7 @@ class ValuationForm extends Component {
               </Grid>
               <Grid item xs={6}>
                 <TextField
-                  label="Living area sizze"
+                  label="Living area size"
                   name="size"
                   type="number"
                   required
