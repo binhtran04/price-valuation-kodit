@@ -1,0 +1,1 @@
+export const GET_VALUATION_DATA = 'get_valuation_data'
