@@ -1,4 +1,7 @@
 import React, { Component } from "react";
+
+import { Field, reduxForm } from "redux-form";
+
 import { cities, floorsAndRooms, apartmentConditions } from "./constants";
 
 import TextField from "@material-ui/core/TextField";
@@ -18,367 +21,152 @@ import { getValuationData } from "../../actions";
 import { connect } from "react-redux";
 
 class ValuationForm extends Component {
-  state = {
-    formError: false,
-    city: "",
-    address: "",
-    postcode: "",
-    floor: "",
-    totalFloors: "",
-    size: "",
-    numberOfRooms: "",
-    constructionYear: "",
-    maintenanceCost: "",
-    apartmentCondition: "",
-    landOwnership: "",
-    elevator: "",
-    balcony: "",
-    pipeRenovation: "",
-    facadeRenovation: ""
-  };
+  onSubmit = async () => {
+    // event.preventDefault();
 
-  handleChange = name => event => {
-    this.setState({
-      [name]: event.target.value
-    });
-  };
-
-  validateForm = () => {
-    let valid = true;
-    Object.keys(this.state).forEach(key => {
-      valid = valid && this.state[key] !== "";
-    });
-    return valid;
-  };
-
-  handleSubmit = async event => {
-    event.preventDefault();
-    if (!this.validateForm()) {
+    try {
+      const response = await this.props.dispatch(getValuationData());
+      console.log("Insight data", response);
+    } catch (error) {
       this.setState({ formError: true });
-    } else {
-      this.setState({ formError: false });
-      try {
-        const response = await this.props.dispatch(getValuationData());
-        console.log("Insight data", response);
-      } catch (error) {
-        this.setState({ formError: true });
-      }
     }
   };
 
-  render() {
-    const {
-      formError,
-      city,
-      address,
-      postcode,
-      floor,
-      totalFloors,
-      size,
-      numberOfRooms,
-      constructionYear,
-      maintenanceCost,
-      apartmentCondition,
-      landOwnership,
-      elevator,
-      balcony,
-      pipeRenovation,
-      facadeRenovation
-    } = this.state;
+  renderTextField({ input, label, meta: { touched, error }, ...custom }) {
+    return (
+      <TextField
+        label={label}
+        fullWidth
+        error={touched && error ? true : false}
+        {...input}
+        {...custom}
+      />
+    );
+  }
 
+  renderSelectField({
+    input,
+    label,
+    meta: { touched, error },
+    children,
+    ...custom
+  }) {
+    return (
+      <TextField
+        select
+        label={label}
+        required
+        fullWidth
+        error={touched && error ? true : false}
+        {...input}
+        {...custom}
+      >
+        {children}
+      </TextField>
+    );
+  }
+
+  render() {
+    const { handleSubmit } = this.props;
     return (
       <Paper square style={{ padding: 20 }}>
         <div className="valuation-form-wrapper">
           <Typography variant="h4" component="h2">
             Home Price Valuation
           </Typography>
-          <form onSubmit={this.handleSubmit}>
+          <form onSubmit={handleSubmit(this.onSubmit.bind(this))}>
             <Grid container spacing={8}>
               <Grid item xs={6}>
-                <TextField
+                <Field
                   name="city"
-                  select
+                  component={this.renderSelectField}
                   label="City"
-                  value={city}
-                  onChange={this.handleChange("city")}
-                  margin="normal"
-                  required
-                  fullWidth
                 >
                   {cities.map(option => (
                     <MenuItem key={option.value} value={option.value}>
                       {option.label}
                     </MenuItem>
                   ))}
-                </TextField>
+                </Field>
               </Grid>
-
               <Grid item xs={6}>
-                <TextField
-                  label="Address"
+                <Field
                   name="address"
-                  type="text"
-                  required
-                  onChange={this.handleChange("address")}
-                  value={address}
-                  margin="normal"
-                  fullWidth
+                  component={this.renderTextField}
+                  label="Adress"
                 />
               </Grid>
-
               <Grid item xs={6}>
-                <TextField
-                  label="Postcode"
+                <Field
                   name="postcode"
-                  type="number"
-                  required
-                  onChange={this.handleChange("postcode")}
-                  value={postcode}
-                  margin="normal"
-                  fullWidth
+                  component={this.renderTextField}
+                  label="Postcode"
                 />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  name="floor"
-                  select
-                  label="Floor"
-                  value={floor}
-                  onChange={this.handleChange("floor")}
-                  margin="normal"
-                  required
-                  fullWidth
-                >
-                  {floorsAndRooms.map(option => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  name="totalFloors"
-                  select
-                  label="Total floors"
-                  value={totalFloors}
-                  onChange={this.handleChange("totalFloors")}
-                  margin="normal"
-                  required
-                  fullWidth
-                >
-                  {floorsAndRooms.map(option => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  name="numberOfRooms"
-                  select
-                  label="Number of rooms"
-                  value={numberOfRooms}
-                  onChange={this.handleChange("numberOfRooms")}
-                  margin="normal"
-                  required
-                  fullWidth
-                >
-                  {floorsAndRooms.map(option => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="Living area size"
-                  name="size"
-                  type="number"
-                  required
-                  onChange={this.handleChange("size")}
-                  value={size}
-                  margin="normal"
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="Construction year"
-                  name="constructionYear"
-                  type="number"
-                  required
-                  onChange={this.handleChange("constructionYear")}
-                  value={constructionYear}
-                  margin="normal"
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="Maintenance cost"
-                  name="maintenanceCost"
-                  type="number"
-                  required
-                  onChange={this.handleChange("maintenanceCost")}
-                  value={maintenanceCost}
-                  margin="normal"
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="Apartment condition"
-                  name="apartmentCondition"
-                  select
-                  value={apartmentCondition}
-                  onChange={this.handleChange("apartmentCondition")}
-                  margin="normal"
-                  required
-                  fullWidth
-                >
-                  {apartmentConditions.map(option => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-              <Grid item xs={6}>
-                <FormControl component="fieldset" fullWidth>
-                  <FormLabel component="legend">Land ownership</FormLabel>
-                  <RadioGroup
-                    aria-label="Land ownership"
-                    name="landOwnership"
-                    value={landOwnership}
-                    onChange={this.handleChange("landOwnership")}
-                  >
-                    <FormControlLabel
-                      value="own"
-                      control={<Radio />}
-                      label="Own"
-                    />
-                    <FormControlLabel
-                      value="rented"
-                      control={<Radio />}
-                      label="Rented"
-                    />
-                  </RadioGroup>
-                </FormControl>
-              </Grid>
-              <Grid item xs={6}>
-                <FormControl component="fieldset" fullWidth>
-                  <FormLabel component="legend">
-                    Is there an elevator in the building
-                  </FormLabel>
-                  <RadioGroup
-                    aria-label="Is there an elevator in the building"
-                    name="elevator"
-                    value={elevator}
-                    onChange={this.handleChange("elevator")}
-                  >
-                    <FormControlLabel
-                      value="yes"
-                      control={<Radio />}
-                      label="Yes"
-                    />
-                    <FormControlLabel
-                      value="no"
-                      control={<Radio />}
-                      label="No"
-                    />
-                  </RadioGroup>
-                </FormControl>
-              </Grid>
-              <Grid item xs={6}>
-                <FormControl component="fieldset" fullWidth>
-                  <FormLabel component="legend">
-                    Is there balcony in the apartment
-                  </FormLabel>
-                  <RadioGroup
-                    aria-label="Is there balcony in the apartment"
-                    name="balcony"
-                    value={balcony}
-                    onChange={this.handleChange("balcony")}
-                  >
-                    <FormControlLabel
-                      value="yes"
-                      control={<Radio />}
-                      label="Yes"
-                    />
-                    <FormControlLabel
-                      value="no"
-                      control={<Radio />}
-                      label="No"
-                    />
-                  </RadioGroup>
-                </FormControl>
-              </Grid>
-              <Grid item xs={6}>
-                <FormControl component="fieldset" fullWidth>
-                  <FormLabel component="legend">
-                    Is there pipe renovation planned within 5 years
-                  </FormLabel>
-                  <RadioGroup
-                    aria-label="Is there pipe renovation planned within 5 years"
-                    name="pipeRenovation"
-                    value={pipeRenovation}
-                    onChange={this.handleChange("pipeRenovation")}
-                  >
-                    <FormControlLabel
-                      value="yes"
-                      control={<Radio />}
-                      label="Yes"
-                    />
-                    <FormControlLabel
-                      value="no"
-                      control={<Radio />}
-                      label="No"
-                    />
-                  </RadioGroup>
-                </FormControl>
-              </Grid>
-              <Grid item xs={6}>
-                <FormControl component="fieldset" fullWidth>
-                  <FormLabel component="legend">
-                    Is there facade renovation planned within 10 years
-                  </FormLabel>
-                  <RadioGroup
-                    aria-label="Is there facade renovation planned within 10 years"
-                    name="facadeRenovation"
-                    value={facadeRenovation}
-                    onChange={this.handleChange("facadeRenovation")}
-                  >
-                    <FormControlLabel
-                      value="yes"
-                      control={<Radio />}
-                      label="Yes"
-                    />
-                    <FormControlLabel
-                      value="no"
-                      control={<Radio />}
-                      label="No"
-                    />
-                  </RadioGroup>
-                </FormControl>
               </Grid>
 
-              {/* Form error message */}
-              {formError && (
-                <Grid item xs={12}>
-                  <FormHelperText error>
-                    Please check the form again
-                  </FormHelperText>
-                </Grid>
-              )}
+              <Grid item xs={6}>
+                <Field
+                  name="floor"
+                  component={this.renderSelectField}
+                  label="Floor"
+                >
+                  {floorsAndRooms.map(option => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Field>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Field
+                  name="numberOfFloors"
+                  component={this.renderSelectField}
+                  label="Number of floors"
+                >
+                  {floorsAndRooms.map(option => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Field>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Field
+                  name="numberOfRooms"
+                  component={this.renderSelectField}
+                  label="Number of Rooms"
+                >
+                  {floorsAndRooms.map(option => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Field>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Field
+                  name="size"
+                  component={this.renderTextField}
+                  label="Living size area"
+                />
+              </Grid>
+
+              <Grid item xs={6}>
+                <Field
+                  name="constructionYear"
+                  component={this.renderTextField}
+                  label="Construction years"
+                />
+              </Grid>
 
               <Grid item xs={12}>
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={this.handleSubmit}
+                  onClick={handleSubmit(this.onSubmit.bind(this))}
                 >
                   Get price valuation
                 </Button>
@@ -391,4 +179,52 @@ class ValuationForm extends Component {
   }
 }
 
-export default connect()(ValuationForm);
+function validate(values) {
+  const errors = {};
+  const requiredFields = [
+    "city",
+    "address",
+    "postcode",
+    "floor",
+    "numberOfFloors",
+    "numberOfRooms",
+    "size",
+    "constructionYear"
+  ];
+  requiredFields.forEach(field => {
+    if (!values[field]) {
+      errors[field] = "Required";
+    }
+  });
+
+  if (
+    !values.postcode ||
+    isNaN(parseInt(values.postcode, 10)) ||
+    parseInt(values.postcode, 10) < 0
+  ) {
+    errors.postcode = "Invalid postcode";
+  }
+
+  if (
+    !values.size ||
+    isNaN(parseInt(values.size, 10)) ||
+    parseInt(values.size, 10) < 0
+  ) {
+    errors.size = "Invalid size";
+  }
+
+  if (
+    !values.constructionYear ||
+    isNaN(parseInt(values.constructionYear, 10)) ||
+    parseInt(values.constructionYear, 10) < 0
+  ) {
+    errors.constructionYear = "Invalid year";
+  }
+
+  return errors;
+}
+
+export default reduxForm({
+  validate,
+  form: "ValuationForm"
+})(connect()(ValuationForm));

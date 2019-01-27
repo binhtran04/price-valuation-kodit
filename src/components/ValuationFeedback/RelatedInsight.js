@@ -10,7 +10,8 @@ import { connect } from "react-redux";
 class RelatedInsight extends Component {
   static defaultProps = {
     valuationList: [],
-    currentValuation: {}
+    currentValuation: {},
+    formValues: {}
   };
 
   state = {
@@ -46,15 +47,24 @@ class RelatedInsight extends Component {
   render() {
     const {
       state: { filter },
-      props: { currentValuation, valuationList }
+      props: { currentValuation, valuationList, formValues }
     } = this;
+
+    const currentSize =
+      parseInt(formValues.size, 10) || currentValuation.size_sqm;
+    const formStreet = formValues.address && formValues.address.split(" ")[0];
+    let currentStreet = currentValuation.street;
+
+    if (valuationList.find(item => item.street === formStreet)) {
+      currentStreet = formStreet;
+    }
 
     const filteredList = valuationList.filter(item => {
       switch (filter) {
         case "similar_size":
           return (
-            currentValuation.size_sqm - 10 <= item.size_sqm &&
-            item.size_sqm <= currentValuation.size_sqm + 10
+            currentSize - 10 <= item.size_sqm &&
+            item.size_sqm <= currentSize + 10
           );
         case "similar_price":
           return (
@@ -62,7 +72,7 @@ class RelatedInsight extends Component {
             item.price_sqm <= currentValuation.price_sqm + 100
           );
         case "same_area":
-          return currentValuation.street === item.street;
+          return currentStreet === item.street;
         default:
           return false;
       }
@@ -96,7 +106,8 @@ class RelatedInsight extends Component {
 const mapStateToProps = state => {
   return {
     valuationList: state.valuation.valuationList,
-    currentValuation: state.valuation.valuationFeedback
+    currentValuation: state.valuation.valuationFeedback,
+    formValues: state.form.ValuationForm.values
   };
 };
 
